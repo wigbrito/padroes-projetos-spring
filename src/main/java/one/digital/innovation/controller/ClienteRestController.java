@@ -1,24 +1,19 @@
 package one.digital.innovation.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import one.digital.innovation.Exceptions.ClienteNotFoundException;
 import one.digital.innovation.model.Cliente;
 import one.digital.innovation.service.ClienteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+
 
 /**
  * Esse {@link RestController} representa nossa <b>Facade</b>, pois abstrai toda
  * a complexidade de integrações (Banco de Dados H2 e API do ViaCEP) em uma
  * interface simples e coesa (API REST).
- * 
+ *
  * @author wigbrito
  */
 
@@ -32,12 +27,16 @@ public class ClienteRestController {
     @GetMapping
     public ResponseEntity<Iterable<Cliente>> buscarTodos() {
         return ResponseEntity.ok(clienteService.buscarTodos());
+
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(clienteService.buscarPorId(id));
-
+        Cliente cliente = clienteService.buscarPorId(id);
+        if (cliente == null) {
+            throw new ClienteNotFoundException("Cliente não encontrado com ID: " + id);
+        }
+        return ResponseEntity.ok(cliente);
     }
 
     @PostMapping
